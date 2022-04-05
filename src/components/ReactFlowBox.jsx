@@ -6,7 +6,7 @@ import {
 import log from 'electron-log';
 // import PillPity from 'pill-pity';
 import React, {
-  createContext, memo, useCallback, useContext, useEffect, useMemo,
+  createContext, memo, useCallback, useContext, useMemo, useState,
 } from 'react';
 import ReactFlow, {
   Background, Controls, useEdgesState, useNodesState,
@@ -23,9 +23,8 @@ const ReactFlowBox = ({
   wrapperRef, nodeTypes, edgeTypes,
 }) => {
   const {
-    nodes, edges, createNode, createConnection,
-    reactFlowInstance, setReactFlowInstance,
-    setNodes, setEdges, onMoveEnd, zoom,
+    createNode, createConnection,
+    onMoveEnd, zoom,
     useMenuCloseFunctions, useHoveredNode,
   } = useContext(GlobalContext);
 
@@ -33,58 +32,60 @@ const ReactFlowBox = ({
     useSnapToGrid,
   } = useContext(SettingsContext);
 
-  const [_nodes, _setNodes, onNodesChange] = useNodesState([]);
-  const [_edges, _setEdges, onEdgesChange] = useEdgesState([]);
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
-  const sortNodesAndEdges = useCallback(() => {
-    const iterators = nodes.filter((n) => n.type === 'iterator'); // .sort((i) => (i.selected ? 1 : -1));
-    let sortedNodes = [];
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    // Sort the nodes in a way that makes iterators stack on each other correctly
-    // Put iterators below their children
-    iterators.forEach((_iterator, index) => {
-      const iterator = _iterator;
-      iterator.zIndex = STARTING_Z_INDEX + (index * 5);
-      sortedNodes.push(iterator);
-      const children = nodes.filter((n) => n.parentNode === iterator.id);
-      // sorted.concat(children);
-      children.forEach((_child) => {
-        const child = _child;
-        child.zIndex = STARTING_Z_INDEX + (index * 5) + 1;
-        // child.position.x = Math.min(Math.max(child.position.x, 0), iterator.width);
-        // child.position.y = Math.min(Math.max(child.position.y, 0), iterator.height);
-        sortedNodes.push(child);
-      });
-    });
+  // const sortNodesAndEdges = useCallback(() => {
+  //   const iterators = nodes.filter((n) => n.type === 'iterator'); // .sort((i) => (i.selected ? 1 : -1));
+  //   let sortedNodes = [];
 
-    // Put nodes not in iterators on top of the iterators
-    const freeNodes = nodes.filter((n) => n.type !== 'iterator' && !n.parentNode);
-    freeNodes.forEach((f) => {
-      sortedNodes.push(f);
-    });
+  //   // Sort the nodes in a way that makes iterators stack on each other correctly
+  //   // Put iterators below their children
+  //   iterators.forEach((_iterator, index) => {
+  //     const iterator = _iterator;
+  //     iterator.zIndex = STARTING_Z_INDEX + (index * 5);
+  //     sortedNodes.push(iterator);
+  //     const children = nodes.filter((n) => n.parentNode === iterator.id);
+  //     // sorted.concat(children);
+  //     children.forEach((_child) => {
+  //       const child = _child;
+  //       child.zIndex = STARTING_Z_INDEX + (index * 5) + 1;
+  //       // child.position.x = Math.min(Math.max(child.position.x, 0), iterator.width);
+  //       // child.position.y = Math.min(Math.max(child.position.y, 0), iterator.height);
+  //       sortedNodes.push(child);
+  //     });
+  //   });
 
-    const indexedEdges = edges.map((e) => {
-      const index = (sortedNodes.find((n) => n.id === e.target)?.zIndex || 1000);
-      return ({ ...e, zIndex: index });
-    });
+  //   // Put nodes not in iterators on top of the iterators
+  //   const freeNodes = nodes.filter((n) => n.type !== 'iterator' && !n.parentNode);
+  //   freeNodes.forEach((f) => {
+  //     sortedNodes.push(f);
+  //   });
 
-    // This fixes the connection line being behind iterators if no edges are present
-    if (indexedEdges.length === 0) {
-      sortedNodes = sortedNodes.map((n) => ({ ...n, zIndex: -1 }));
-    }
+  //   const indexedEdges = edges.map((e) => {
+  //     const index = (sortedNodes.find((n) => n.id === e.target)?.zIndex || 1000);
+  //     return ({ ...e, zIndex: index });
+  //   });
 
-    _setNodes(sortedNodes);
-    _setEdges(indexedEdges);
-  }, [nodes, edges, _setNodes, _setEdges]);
+  //   // This fixes the connection line being behind iterators if no edges are present
+  //   if (indexedEdges.length === 0) {
+  //     sortedNodes = sortedNodes.map((n) => ({ ...n, zIndex: -1 }));
+  //   }
 
-  useEffect(() => {
-    sortNodesAndEdges();
-  }, [nodes, edges]);
+  //   setNodes(sortedNodes);
+  //   setEdges(indexedEdges);
+  // }, [nodes, edges]);
 
-  const onNodeDragStop = useCallback(() => {
-    setNodes(_nodes);
-    setEdges(_edges);
-  }, [_nodes, _edges]);
+  // useEffect(() => {
+  //   sortNodesAndEdges();
+  // }, [nodes, edges]);
+
+  // const onNodeDragStop = useCallback(() => {
+  //   setNodes(_nodes);
+  //   setEdges(_edges);
+  // }, [_nodes, _edges]);
 
   const onNodesDelete = useCallback((_nodesToDelete) => {
     // Prevent iterator helpers from being deleted
@@ -94,36 +95,36 @@ const ReactFlowBox = ({
     const nodeIds = nodesToDelete.map((n) => n.id);
     const newNodes = nodes.filter((n) => !nodeIds.includes(n.id));
     setNodes(newNodes);
-  }, [_setNodes, _nodes, setNodes, nodes]);
+  }, [setNodes, nodes]);
 
   const onEdgesDelete = useCallback((edgesToDelete) => {
     const edgeIds = edgesToDelete.map((e) => e.id);
     const newEdges = edges.filter((e) => !edgeIds.includes(e.id));
     setEdges(newEdges);
-  }, [setEdges, _edges, edges]);
+  }, [setEdges, edges]);
 
   const memoNodeTypes = useMemo(() => (nodeTypes), []);
   const memoEdgeTypes = useMemo(() => (edgeTypes), []);
 
   const [isSnapToGrid, , snapToGridAmount] = useSnapToGrid;
 
-  useEffect(() => {
-    if (isSnapToGrid) {
-      const alignedNodes = nodes.map((n) => {
-        if (n.parentNode) {
-          return n;
-        }
-        return {
-          ...n,
-          position: {
-            x: n.position.x - (n.position.x % snapToGridAmount),
-            y: n.position.y - (n.position.y % snapToGridAmount),
-          },
-        };
-      });
-      _setNodes(alignedNodes);
-    }
-  }, [snapToGridAmount, nodes]);
+  // useEffect(() => {
+  //   if (isSnapToGrid) {
+  //     const alignedNodes = nodes.map((n) => {
+  //       if (n.parentNode) {
+  //         return n;
+  //       }
+  //       return {
+  //         ...n,
+  //         position: {
+  //           x: n.position.x - (n.position.x % snapToGridAmount),
+  //           y: n.position.y - (n.position.y % snapToGridAmount),
+  //         },
+  //       };
+  //     });
+  //     setNodes(alignedNodes);
+  //   }
+  // }, [snapToGridAmount, nodes]);
 
   const onInit = useCallback(
     (rfi) => {
@@ -202,8 +203,8 @@ const ReactFlowBox = ({
   return (
     <Box w="100%" h="100%" borderWidth="1px" borderRadius="lg" ref={wrapperRef} bg={useColorModeValue('gray.100', 'gray.800')}>
       <ReactFlow
-        nodes={_nodes}
-        edges={_edges}
+        nodes={nodes}
+        edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onEdgesDelete={onEdgesDelete}
@@ -213,7 +214,7 @@ const ReactFlowBox = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragStart={onDragStart}
-        onNodeDragStop={onNodeDragStop}
+        // onNodeDragStop={onNodeDragStop}
         nodeTypes={memoNodeTypes}
         edgeTypes={memoEdgeTypes}
         onNodeContextMenu={onNodeContextMenu}

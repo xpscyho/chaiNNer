@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable import/extensions */
 import {
-    Center, useColorModeValue, VStack
+  Center, useColorModeValue, VStack,
 } from '@chakra-ui/react';
 import React, {
-    memo, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState
+  memo, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
+import { useReactFlow } from 'react-flow-renderer';
 import checkNodeValidity from '../../helpers/checkNodeValidity.js';
 import { GlobalContext } from '../../helpers/contexts/GlobalNodeState.jsx';
 import getAccentColor from '../../helpers/getNodeAccentColors.js';
@@ -37,8 +38,15 @@ const IteratorHelperNode = ({
   data, selected,
 }) => {
   const {
-    nodes, edges, availableNodes, updateIteratorBounds, useHoveredNode,
+    availableNodes, updateIteratorBounds, useHoveredNode,
   } = useContext(GlobalContext);
+
+  const {
+    getNodes, getEdges,
+  } = useReactFlow();
+
+  const nodes = getNodes();
+  const edges = getEdges();
 
   const {
     id, inputData, isLocked, category, type, parentNode,

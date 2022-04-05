@@ -2,11 +2,12 @@
 /* eslint-disable import/extensions */
 import { CloseIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
-    Center, Menu, MenuItem, MenuList, Portal, useColorModeValue, VStack
+  Center, Menu, MenuItem, MenuList, Portal, useColorModeValue, VStack,
 } from '@chakra-ui/react';
 import React, {
-    memo, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState
+  memo, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
+import { useReactFlow } from 'react-flow-renderer';
 import checkNodeValidity from '../../helpers/checkNodeValidity.js';
 import { GlobalContext } from '../../helpers/contexts/GlobalNodeState.jsx';
 import getAccentColor from '../../helpers/getNodeAccentColors.js';
@@ -42,8 +43,15 @@ const Node = memo(({
   data, selected,
 }) => {
   const {
-    nodes, edges, availableNodes, updateIteratorBounds, useHoveredNode,
+    availableNodes, updateIteratorBounds, useHoveredNode,
   } = useContext(GlobalContext);
+
+  const {
+    getNodes, getEdges,
+  } = useReactFlow();
+
+  const nodes = getNodes();
+  const edges = getEdges();
 
   const {
     id, inputData, isLocked, category, type, parentNode,

@@ -5,7 +5,7 @@ import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  getOutgoers, useEdgesState, useNodesState, useReactFlow,
+  getOutgoers, useReactFlow,
 } from 'react-flow-renderer';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,29 +26,30 @@ export const GlobalProvider = ({
     snapToGridAmount,
   } = useContext(SettingsContext);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  // const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  // const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {
-    setViewport, getViewport,
+    setViewport, getViewport, getNodes, getEdges, setNodes, setEdges, getNode, getEdge,
   } = useReactFlow();
 
-  // Cache node state to avoid clearing state when refreshing
-  const [cachedNodes, setCachedNodes] = useSessionStorage('cachedNodes', []);
-  const [cachedEdges, setCachedEdges] = useSessionStorage('cachedEdges', []);
-  const [cachedViewport, setCachedViewport] = useSessionStorage('cachedViewport', {});
-  useEffect(() => {
-    setCachedNodes(nodes);
-    setCachedEdges(edges);
-    setCachedViewport(getViewport());
-  }, [nodes, edges]);
-  useEffect(() => {
-    setViewport(cachedViewport);
-    setNodes(cachedNodes);
-    setEdges(cachedEdges);
-  }, []);
+  // const nodes = getNodes();
+  // const edges = getEdges();
 
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  // const [reactFlowInstanceRfi, setRfi] = useState(null);
+  // Cache node state to avoid clearing state when refreshing
+  // const [cachedNodes, setCachedNodes] = useSessionStorage('cachedNodes', []);
+  // const [cachedEdges, setCachedEdges] = useSessionStorage('cachedEdges', []);
+  // const [cachedViewport, setCachedViewport] = useSessionStorage('cachedViewport', {});
+  // useEffect(() => {
+  //   setCachedNodes(nodes);
+  //   setCachedEdges(edges);
+  //   setCachedViewport(getViewport());
+  // }, [nodes, edges]);
+  // useEffect(() => {
+  //   setViewport(cachedViewport);
+  //   setNodes(cachedNodes);
+  //   setEdges(cachedEdges);
+  // }, []);
+
   const [savePath, setSavePath] = useState();
 
   const [loadedFromCli, setLoadedFromCli] = useSessionStorage('loaded-from-cli', false);
@@ -61,7 +62,7 @@ export const GlobalProvider = ({
     const output = JSON.stringify({
       version: await ipcRenderer.invoke('get-app-version'),
       content: {
-        nodes, edges, viewport: getViewport(),
+        nodes: getNodes(), edges: getEdges(), viewport: getViewport(),
       },
       timestamp: new Date(),
     });
@@ -117,7 +118,7 @@ export const GlobalProvider = ({
       const savedAsPath = await ipcRenderer.invoke('file-save-as-json', json, savePath);
       setSavePath(savedAsPath);
     }
-  }, [nodes, edges, savePath]);
+  }, [savePath]);
 
   useHotkeys('ctrl+s', performSave, {}, [savePath]);
   // useHotkeys('ctrl+z', undo, {}, [reactFlowInstanceRfi, nodes, edges]);
@@ -190,7 +191,7 @@ export const GlobalProvider = ({
       ipcRenderer.removeAllListeners('file-save-as');
       ipcRenderer.removeAllListeners('file-save');
     };
-  }, [nodes, edges, savePath]);
+  }, [savePath]);
 
   // Push state to undo history
   // useEffect(() => {
@@ -199,6 +200,8 @@ export const GlobalProvider = ({
 
   const convertToUsableFormat = useCallback(() => {
     const result = {};
+    const nodes = getNodes();
+    const edges = getEdges();
 
     // Set up each node in the result
     nodes.forEach((element) => {
@@ -257,19 +260,21 @@ export const GlobalProvider = ({
     // console.log('convert', result);
 
     return result;
-  }, [nodes, edges]);
+  }, [getNodes, getEdges]);
 
   const removeNodeById = useCallback((id) => {
+    const nodes = getNodes();
     if (nodes.find((n) => n.id === id).nodeType !== 'iteratorHelper') {
       const newNodes = nodes.filter((n) => n.id !== id && n.parentNode !== id);
       setNodes(newNodes);
     }
-  }, [nodes, setNodes]);
+  }, [getNodes, setNodes]);
 
   const removeEdgeById = useCallback((id) => {
+    const edges = getEdges();
     const newEdges = edges.filter((e) => e.id !== id);
     setEdges(newEdges);
-  }, [edges, setEdges]);
+  }, [getEdges, setEdges]);
 
   const getInputDefaults = useCallback(({ category, type }) => {
     const defaultData = {};
@@ -305,13 +310,13 @@ export const GlobalProvider = ({
     if (parent || (hoveredNode && nodeType !== 'iterator')) {
       let parentNode;
       if (typeof parent === 'string' || parent instanceof String) {
-        parentNode = nodes.find((n) => n.id === parent);
+        parentNode = getNode(parent);
         // eslint-disable-next-line no-param-reassign
         parent = null; // This is so it actually set the nodes
       } else if (parent) {
         parentNode = parent;
       } else {
-        parentNode = nodes.find((n) => n.id === hoveredNode);
+        parentNode = getNode(hoveredNode);
       }
       if (parentNode && parentNode.type === 'iterator' && newNode.type !== 'iterator') {
         const {
@@ -348,6 +353,7 @@ export const GlobalProvider = ({
       });
     }
     if (!parent) {
+      const nodes = getNodes();
       setNodes([
         ...nodes,
         newNode,
@@ -355,11 +361,12 @@ export const GlobalProvider = ({
       ]);
     }
     return newNode;
-  }, [nodes, setNodes, availableNodes, hoveredNode, getInputDefaults]);
+  }, [getNodes, getNode, setNodes, availableNodes, hoveredNode, getInputDefaults]);
 
   const createConnection = useCallback(({
     source, sourceHandle, target, targetHandle,
   }) => {
+    const edges = getEdges();
     const id = createUniqueId();
     const newEdge = {
       id,
@@ -375,7 +382,7 @@ export const GlobalProvider = ({
       ...(edges.filter((edge) => edge.targetHandle !== targetHandle)),
       newEdge,
     ]);
-  }, [edges, setEdges]);
+  }, [getEdges, setEdges]);
 
   useEffect(() => {
     const flow = JSON.parse(sessionStorage.getItem('rfi'));
@@ -396,8 +403,8 @@ export const GlobalProvider = ({
     const [sourceHandleIndex] = sourceHandle.split('-').slice(-1);
     const [targetHandleIndex] = targetHandle.split('-').slice(-1);
 
-    const sourceNode = nodes.find((node) => node.id === source);
-    const targetNode = nodes.find((node) => node.id === target);
+    const sourceNode = getNode(source);
+    const targetNode = getNode(target);
 
     // Target inputs, source outputs
     const { outputs } = availableNodes[sourceNode.data.category][sourceNode.data.type];
@@ -407,6 +414,8 @@ export const GlobalProvider = ({
     const targetInput = inputs[targetHandleIndex];
 
     const checkTargetChildren = (parentNode) => {
+      const nodes = getNodes();
+      const edges = getEdges();
       const targetChildren = getOutgoers(parentNode, nodes, edges);
       if (!targetChildren.length) {
         return false;
@@ -423,10 +432,10 @@ export const GlobalProvider = ({
     const iteratorLock = !sourceNode.parentNode || sourceNode.parentNode === targetNode.parentNode;
 
     return sourceOutput.type === targetInput.type && !isLoop && iteratorLock;
-  }, [nodes, edges, availableNodes]);
+  }, [getNodes, getEdges, availableNodes]);
 
   const useInputData = useCallback((id, index) => {
-    const nodeById = nodes.find((node) => node.id === id) ?? {};
+    const nodeById = getNode(id) ?? {};
     const nodeData = nodeById?.data;
 
     if (!nodeData) {
@@ -447,6 +456,7 @@ export const GlobalProvider = ({
           [index]: data,
         };
       }
+      const nodes = getNodes();
       const filteredNodes = nodes.filter((n) => n.id !== id);
       setNodes([
         ...filteredNodes,
@@ -454,10 +464,11 @@ export const GlobalProvider = ({
       ]);
     };
     return [inputDataByIndex, setInputData];
-  }, [nodes, setNodes]);
+  }, [getNodes, getNode, setNodes]);
 
   const useAnimateEdges = useCallback(() => {
     const animateEdges = () => {
+      const edges = getEdges();
       setEdges(edges.map((edge) => ({
         ...edge,
         animated: true,
@@ -465,6 +476,7 @@ export const GlobalProvider = ({
     };
 
     const unAnimateEdges = (nodeIdsToUnAnimate) => {
+      const edges = getEdges();
       if (nodeIdsToUnAnimate) {
         const edgesToUnAnimate = edges.filter((e) => nodeIdsToUnAnimate.includes(e.source));
         const unanimatedEdges = edgesToUnAnimate.map((edge) => ({
@@ -485,6 +497,7 @@ export const GlobalProvider = ({
     };
 
     const completeEdges = (finished) => {
+      const edges = getEdges();
       setEdges(edges.map((edge) => {
         const complete = finished.includes(edge.source);
         return {
@@ -499,6 +512,7 @@ export const GlobalProvider = ({
     };
 
     const clearCompleteEdges = () => {
+      const edges = getEdges();
       setEdges(edges.map((edge) => ({
         ...edge,
         animated: false,
@@ -510,11 +524,11 @@ export const GlobalProvider = ({
     };
 
     return [animateEdges, unAnimateEdges, completeEdges, clearCompleteEdges];
-  }, [edges, setEdges]);
+  }, [getEdges, setEdges]);
 
   // TODO: performance concern? runs twice when deleting node
   const useNodeLock = useCallback((id, index = null) => {
-    const node = nodes.find((n) => n.id === id);
+    const node = getNode(id);
     if (!node) {
       return [];
     }
@@ -523,6 +537,7 @@ export const GlobalProvider = ({
       node.draggable = isLocked;
       node.connectable = isLocked;
       node.data.isLocked = !isLocked;
+      const nodes = getNodes();
       setNodes([
         ...nodes.filter((n) => n.id !== id),
         node,
@@ -531,18 +546,20 @@ export const GlobalProvider = ({
 
     let isInputLocked = false;
     if (index !== undefined && index !== null) {
+      const edges = getEdges();
       const edge = edges.find((e) => e.target === id && String(e.targetHandle.split('-').slice(-1)) === String(index));
       isInputLocked = !!edge;
     }
     return [isLocked, toggleLock, isInputLocked];
-  }, [nodes, edges, setNodes]);
+  }, [getNode, getNodes, getEdges, setNodes]);
 
   const useIteratorSize = useCallback((id) => {
     const defaultSize = { width: 480, height: 480 };
-    const node = nodes.find((n) => n.id === id);
+    const node = getNode(id);
 
     const setIteratorSize = (size) => {
       node.data.iteratorSize = size;
+      const nodes = getNodes();
       setNodes([
         ...nodes.filter((n) => n.id !== id),
         node,
@@ -550,10 +567,11 @@ export const GlobalProvider = ({
     };
 
     return [setIteratorSize, defaultSize];
-  }, [nodes, setNodes]);
+  }, [getNode, getNodes, setNodes]);
 
   // TODO: this can probably be cleaned up but its good enough for now
   const updateIteratorBounds = useCallback((id, iteratorSize, dimensions) => {
+    const nodes = getNodes();
     const nodesToUpdate = nodes.filter((n) => n.parentNode === id);
     const iteratorNode = nodes.find((n) => n.id === id);
     if (nodesToUpdate.length > 0) {
@@ -587,22 +605,26 @@ export const GlobalProvider = ({
         ...newNodes,
       ]);
     }
-  }, [nodes, setNodes]);
+  }, [getNodes, setNodes]);
 
   const setIteratorPercent = useCallback((id, percent) => {
-    const iterator = nodes.find((n) => n.id === id);
+    const iterator = getNode(id);
     if (iterator && iterator.data) {
       iterator.data.percentComplete = percent;
     }
+    const nodes = getNodes();
     const filteredNodes = nodes.filter((n) => n.id !== id);
     setNodes([
       iterator,
       ...filteredNodes,
     ]);
-  }, [nodes, setNodes]);
+  }, [getNode, getNodes, setNodes]);
 
   const duplicateNode = useCallback((id) => {
-    const node = nodes.find((n) => n.id === id);
+    const node = getNode(id);
+    const nodes = getNodes();
+    const edges = getEdges();
+
     const newId = createUniqueId();
     const newNode = {
       ...node,
@@ -669,9 +691,10 @@ export const GlobalProvider = ({
       ...edges,
       ...newEdges,
     ]);
-  }, [nodes, edges, availableNodes]);
+  }, [getNode, getNodes, getEdges, availableNodes]);
 
   const clearNode = (id) => {
+    const nodes = getNodes();
     const nodesCopy = [...nodes];
     const node = nodesCopy.find((n) => n.id === id);
     node.data.inputData = getInputDefaults(node.data);
@@ -682,6 +705,7 @@ export const GlobalProvider = ({
   };
 
   const outlineInvalidNodes = (invalidNodes) => {
+    const nodes = getNodes();
     const invalidIds = invalidNodes.map((node) => node.id);
     const mappedNodes = invalidNodes.map((node) => {
       const nodeCopy = { ...node };
@@ -695,6 +719,7 @@ export const GlobalProvider = ({
   };
 
   const unOutlineInvalidNodes = (invalidNodes) => {
+    const nodes = getNodes();
     const invalidIds = invalidNodes.map((node) => node.id);
     const mappedNodes = invalidNodes.map((node) => {
       const nodeCopy = { ...node };
@@ -726,17 +751,9 @@ export const GlobalProvider = ({
 
   const contextValue = useMemo(() => ({
     availableNodes,
-    nodes,
-    edges,
-    setNodes,
-    setEdges,
-    onNodesChange,
-    onEdgesChange,
     createNode,
     createConnection,
     convertToUsableFormat,
-    reactFlowInstance,
-    setReactFlowInstance,
     // updateRfi,
     reactFlowWrapper,
     isValidConnection,
@@ -759,7 +776,6 @@ export const GlobalProvider = ({
     useHoveredNode: [hoveredNode, setHoveredNode],
     useMenuCloseFunctions: [closeAllMenus, addMenuCloseFunction],
   }), [
-    nodes, edges, reactFlowInstance,
     zoom, hoveredNode, menuCloseFunctions,
   ]);
 

@@ -8,7 +8,7 @@ import React, {
   memo, useCallback, useContext, useMemo, useState,
 } from 'react';
 import {
-  getBezierPath, getEdgeCenter,
+  getBezierPath, getEdgeCenter, useReactFlow,
 } from 'react-flow-renderer';
 import { useDebouncedCallback } from 'use-debounce';
 import { GlobalContext } from '../helpers/contexts/GlobalNodeState.jsx';
@@ -49,15 +49,19 @@ const CustomEdge = memo(({
   targetPosition,
   style = {},
   selected,
+  source,
 }) => {
   const edgePath = useMemo(() => getBezierPath({
     sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition,
   }), [sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition]);
 
-  const { removeEdgeById, nodes, edges } = useContext(GlobalContext);
+  const { removeEdgeById } = useContext(GlobalContext);
 
-  const edge = useMemo(() => edges.find((e) => e.id === id), []);
-  const parentNode = useMemo(() => nodes.find((n) => edge.source === n.id), []);
+  const {
+    getNode,
+  } = useReactFlow();
+
+  const parentNode = useMemo(() => getNode(source), []);
 
   const [isHovered, setIsHovered] = useState(false);
 

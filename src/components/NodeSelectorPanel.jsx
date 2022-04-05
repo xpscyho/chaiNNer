@@ -2,14 +2,15 @@
 /* eslint-disable react/prop-types */
 import { SearchIcon } from '@chakra-ui/icons';
 import {
-    Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel,
-    Box, Center, Divider, Heading, HStack, Input,
-    InputGroup, InputLeftElement, Tab, TabList, TabPanel,
-    TabPanels, Tabs, Text, Tooltip, useColorModeValue, useDisclosure, Wrap, WrapItem
+  Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel,
+  Box, Center, Divider, Heading, HStack, Input,
+  InputGroup, InputLeftElement, Tab, TabList, TabPanel,
+  TabPanels, Tabs, Text, Tooltip, useColorModeValue, useDisclosure, Wrap, WrapItem,
 } from '@chakra-ui/react';
 import React, {
-    memo, useContext, useEffect, useState
+  memo, useContext, useEffect, useState,
 } from 'react';
+import { useReactFlow } from 'react-flow-renderer';
 import { GlobalContext } from '../helpers/contexts/GlobalNodeState.jsx';
 import getNodeAccentColor from '../helpers/getNodeAccentColors.js';
 import { IconFactory } from './CustomIcons.jsx';
@@ -39,8 +40,12 @@ const NodeSelector = ({ data, height }) => {
   const [namespaces, setNamespaces] = useState([]);
 
   const {
-    createNode, reactFlowInstance, reactFlowWrapper, useHoveredNode,
+    createNode, reactFlowWrapper, useHoveredNode,
   } = useContext(GlobalContext);
+
+  const {
+    project,
+  } = useReactFlow();
 
   const [, setHoveredNode] = useHoveredNode;
 
@@ -194,7 +199,7 @@ const NodeSelector = ({ data, height }) => {
                                             height: wHeight, width,
                                           } = reactFlowWrapper.current.getBoundingClientRect();
 
-                                          const position = reactFlowInstance.project({
+                                          const position = project({
                                             x: width / 2,
                                             y: wHeight / 2,
                                           });

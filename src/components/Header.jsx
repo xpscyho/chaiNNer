@@ -12,6 +12,7 @@ import log from 'electron-log';
 import React, {
   memo, useContext, useEffect, useState,
 } from 'react';
+import { useReactFlow } from 'react-flow-renderer';
 import { IoPause, IoPlay, IoStop } from 'react-icons/io5';
 import useFetch from 'use-http';
 import checkNodeValidity from '../helpers/checkNodeValidity.js';
@@ -26,11 +27,13 @@ const Header = ({ port }) => {
   const {
     convertToUsableFormat,
     useAnimateEdges,
-    nodes,
-    edges,
     availableNodes,
     setIteratorPercent,
   } = useContext(GlobalContext);
+
+  const {
+    getNodes, getEdges,
+  } = useReactFlow();
 
   const {
     useIsCpu,
@@ -115,6 +118,7 @@ const Header = ({ port }) => {
   async function run() {
     setRunning(true);
     animateEdges();
+    const nodes = getNodes();
     if (nodes.length === 0) {
       setErrorMessage('There are no nodes to run.');
       onErrorOpen();
@@ -122,6 +126,7 @@ const Header = ({ port }) => {
       const nodeValidities = nodes.map(
         (node) => {
           const { inputs } = availableNodes[node.data.category][node.data.type];
+          const edges = getEdges();
           return [...checkNodeValidity({
             id: node.id, inputData: node.data.inputData, edges, inputs,
           }), node.data.type];
