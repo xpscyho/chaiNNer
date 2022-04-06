@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable import/extensions */
 import {
-    Center, Text, useColorModeValue, VStack
+  Center, Text, useColorModeValue, VStack,
 } from '@chakra-ui/react';
 import React, {
-    memo, useContext, useEffect, useMemo, useRef, useState
+  memo, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
+import { useEdges } from 'react-flow-renderer';
 import checkNodeValidity from '../../helpers/checkNodeValidity.js';
 import { GlobalContext } from '../../helpers/contexts/GlobalNodeState.jsx';
 import getAccentColor from '../../helpers/getNodeAccentColors.js';
@@ -41,8 +42,10 @@ const IteratorNodeWrapper = memo(
 
 const IteratorNode = memo(({ data, selected }) => {
   const {
-    edges, availableNodes, useHoveredNode,
+    availableNodes, useHoveredNode,
   } = useContext(GlobalContext);
+
+  const edges = useEdges();
 
   const {
     id, inputData, isLocked, category, type, iteratorSize, maxWidth, maxHeight, percentComplete,

@@ -39,18 +39,19 @@ const EdgeWrapper = memo(({
   />
 ));
 
-const CustomEdge = memo(({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  sourcePosition,
-  targetPosition,
-  style = {},
-  selected,
-  source,
-}) => {
+const CustomEdge = memo((props) => {
+  const {
+    id,
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    sourcePosition,
+    targetPosition,
+    style = {},
+    selected,
+    source,
+  } = props;
   const edgePath = useMemo(() => getBezierPath({
     sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition,
   }), [sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition]);
@@ -58,10 +59,10 @@ const CustomEdge = memo(({
   const { removeEdgeById } = useContext(GlobalContext);
 
   const {
-    getNode,
+    getEdge, getNode,
   } = useReactFlow();
 
-  const parentNode = useMemo(() => getNode(source), []);
+  const parentNode = useMemo(() => getNode(getEdge(id).source), []);
 
   const [isHovered, setIsHovered] = useState(false);
 
