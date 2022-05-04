@@ -23,3 +23,23 @@ body {
         stroke-dashoffset: 10;
     }
 }
+
+.react-flow__controls {
+    border-radius: 8px 8px 8px 8px;
+    opacity: 50%;
+    transition: 0.15s opacity ease-in-out;
+}
+
+.react-flow__controls:hover {
+    opacity: 100%;
+    transition: 0.15s opacity ease-in-out;
+}
+
+
+.react-flow__controls-zoomin {
+    border-radius: 8px 8px 0px 0px;
+}
+
+.react-flow__controls-interactive {
+    border-radius: 0px 0px 8px 8px;
+}
