@@ -6,3 +6,4 @@ Pillow
 pylint
 sanic
 sanic_cors
+mypy

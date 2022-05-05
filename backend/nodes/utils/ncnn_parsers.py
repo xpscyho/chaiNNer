@@ -9,9 +9,9 @@ FLAG_FLOAT_16 = 0x01306B47
 def parse_ncnn_param(param_path):
     with open(param_path, "r", encoding="utf-8") as infile:
         magic = int(infile.readline().rstrip())
-        print(f"{magic=}")
+        print(f"magic={magic}")
         layer_count, blob_count = [int(x) for x in infile.readline().rstrip().split()]
-        print(f"{layer_count=} {blob_count=}")
+        print(f"layer_count={layer_count} blob_count={blob_count}")
         for _ in range(layer_count):
             line = infile.readline().rstrip()
             layer_type, layer_name, input_count, output_count = line.split()[0:4]
@@ -50,7 +50,7 @@ def parse_ncnn_param(param_path):
                 layer_specific_params = []
 
             print(
-                f"{layer_type=} {layer_name=} {input_count=} {output_count=} {input_blobs=} {output_blobs=} {layer_specific_params=}"
+                f"layer_type={layer_type} layer_name={layer_name} input_count={input_count} output_count={output_count} input_blobs={input_blobs} output_blobs={output_blobs} layer_specific_params={layer_specific_params}"
             )
 
 
@@ -76,7 +76,7 @@ def parse_ncnn_bin_from_file(bin_path: str):
 
 
 def parse_ncnn_bin_from_buffer(bin_buf: bytes):
-    def get_flag(bin_file: bytes) -> int:
+    def get_flag(bin_file: bytes) -> bytes:
         flag = bin_file[:4]
         flag = struct.unpack("<I", flag)[0]
         return flag

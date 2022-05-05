@@ -142,7 +142,7 @@ async def run(request: Request):
         )
         return json({"message": "Successfully ran nodes!"}, status=200)
     except Exception as exception:
-        logger.error(exception, exc_info=1)
+        logger.error(exception, exc_info=True)
         request.app.ctx.executor = None
         logger.error(traceback.format_exc())
         await queue.put(

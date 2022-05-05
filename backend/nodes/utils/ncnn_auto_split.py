@@ -1,5 +1,5 @@
 import gc
-from typing import Tuple
+from typing import List, Tuple
 
 import numpy as np
 from ncnn_vulkan import ncnn
@@ -64,8 +64,8 @@ def ncnn_auto_split_process(
                 lr_img_fix.shape[1],
                 lr_img_fix.shape[0],
             )
-            mean_vals = []
-            norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
+            mean_vals: List[float] = []
+            norm_vals: List[float] = [1 / 255.0, 1 / 255.0, 1 / 255.0]
             mat_in.substract_mean_normalize(mean_vals, norm_vals)
             ex.input(input_name, mat_in)
             _, mat_out = ex.extract(output_name)
