@@ -145,6 +145,7 @@ const SliderInput = memo(
                         isDisabled={isLocked}
                         max={max}
                         min={min}
+                        minW="200px"
                         step={step}
                         value={sliderValue ?? def}
                         onChange={onSliderChange}
