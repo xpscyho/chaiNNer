@@ -3,7 +3,6 @@ import path from 'path';
 import { DragEvent, memo, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useReactFlow } from 'reactflow';
 import { useContext, useContextSelector } from 'use-context-selector';
-import { Input, NodeData } from '../../../common/common-types';
 import { DisabledStatus } from '../../../common/nodes/disabled';
 import {
     EMPTY_ARRAY,
@@ -23,40 +22,22 @@ import { useNodeMenu } from '../../hooks/useNodeMenu';
 import { useRunNode } from '../../hooks/useRunNode';
 import { useValidity } from '../../hooks/useValidity';
 import { useWatchFiles } from '../../hooks/useWatchFiles';
-import { NodeBody } from './NodeBody';
+import { HNodeBody } from './HorizontalNodeBody';
+import { NodeProps, getSingleFileInput } from './Node';
 import { NodeFooter } from './NodeFooter/NodeFooter';
-import { NodeHeader } from './NodeHeader';
-
 /**
  * If there is only one file input, then this input will be returned. `undefined` otherwise.
  */
-export const getSingleFileInput = (inputs: readonly Input[]): Input | undefined => {
-    const fileInputs = inputs.filter((i) => {
-        switch (i.kind) {
-            case 'file':
-                return true;
-            default:
-                return false;
-        }
-    });
 
-    return fileInputs.length === 1 ? fileInputs[0] : undefined;
-};
-
-export const Node = memo(({ data, selected }: NodeProps) => (
+export const CompactNode = memo(({ data, selected }: NodeProps) => (
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    <NodeInner
+    <CompactNodeInner
         data={data}
         selected={selected}
     />
 ));
 
-export interface NodeProps {
-    data: NodeData;
-    selected: boolean;
-}
-
-const NodeInner = memo(({ data, selected }: NodeProps) => {
+const CompactNodeInner = memo(({ data, selected }: NodeProps) => {
     const nodeState = useNodeStateFromData(data);
     const { schema, setInputValue } = nodeState;
 
@@ -197,28 +178,11 @@ const NodeInner = memo(({ data, selected }: NodeProps) => {
             onDragOver={onDragOver}
             onDrop={onDrop}
         >
-            <VStack
-                opacity={disabled.status === DisabledStatus.Enabled ? 1 : 0.75}
-                spacing={0}
-                w="full"
-            >
-                <VStack
-                    spacing={0}
-                    w="full"
-                >
-                    <NodeHeader
-                        accentColor={accentColor}
-                        disabledStatus={disabled.status}
-                        icon={schema.icon}
-                        name={schema.name}
-                        parentNode={parentNode}
-                        selected={selected}
-                    />
-                    <NodeBody
-                        animated={animated}
-                        nodeState={nodeState}
-                    />
-                </VStack>
+            <VStack opacity={disabled.status === DisabledStatus.Enabled ? 1 : 0.75}>
+                <HNodeBody
+                    animated={animated}
+                    nodeState={nodeState}
+                />
                 <NodeFooter
                     animated={animated}
                     id={id}

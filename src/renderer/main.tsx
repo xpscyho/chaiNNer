@@ -9,6 +9,7 @@ import { ChaiNNerLogo } from './components/chaiNNerLogo';
 import { CustomEdge } from './components/CustomEdge/CustomEdge';
 import { Header } from './components/Header/Header';
 import { HistoryProvider } from './components/HistoryProvider';
+import { CompactNode } from './components/node/CompactNode';
 import { IteratorHelperNode } from './components/node/IteratorHelperNode';
 import { IteratorNode } from './components/node/IteratorNode';
 import { Node } from './components/node/Node';
@@ -26,6 +27,7 @@ import { useLastWindowSize } from './hooks/useLastWindowSize';
 
 const nodeTypes: NodeTypes & Record<NodeType, unknown> = {
     regularNode: Node,
+    compact: CompactNode,
     iterator: IteratorNode,
     iteratorHelper: IteratorHelperNode,
 };

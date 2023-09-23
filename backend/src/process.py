@@ -9,8 +9,6 @@ from collections.abc import Awaitable
 from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, Dict, Iterable, List, Literal, Optional, Tuple, TypeVar
 
-from sanic.log import logger
-
 from api import NodeData
 from base_types import NodeId, OutputId
 from chain.cache import CacheStrategy, OutputCache, get_cache_strategies
@@ -19,6 +17,7 @@ from chain.input import EdgeInput, InputMap
 from events import Event, EventQueue, InputsDict
 from nodes.base_output import BaseOutput
 from progress_controller import Aborted, ProgressController, ProgressToken
+from sanic.log import logger
 
 Output = List[object]
 
@@ -99,7 +98,11 @@ def enforce_output(raw_output: object, node: NodeData) -> Output:
 
 
 def run_node(node: NodeData, inputs: Iterable[object], node_id: NodeId) -> Output:
-    assert node.type == "regularNode" or node.type == "iteratorHelper"
+    assert (
+        node.type == "regularNode"
+        or node.type == "compact"
+        or node.type == "iteratorHelper"
+    )
 
     enforced_inputs = enforce_inputs(inputs, node, node_id)
     try:

@@ -30,7 +30,7 @@ export const NodeFooter = memo(({ id, validity, useDisable, animated }: NodeFoot
         >
             <SimpleGrid
                 columns={3}
-                spacing={2}
+                spacing={1}
                 w="full"
             >
                 <Center marginRight="auto">
