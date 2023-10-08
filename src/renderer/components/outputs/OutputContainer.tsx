@@ -87,7 +87,7 @@ export const OutputContainer = memo(
         return (
             <Box
                 bg="var(--bg-700)"
-                h="auto"
+                // h=""
                 minH="2rem"
                 ml="auto"
                 mr={0}
@@ -97,10 +97,11 @@ export const OutputContainer = memo(
             >
                 {!generic && (
                     <Center
-                        h="1.25rem"
+                        h="full"
                         px={1}
                         py={0.5}
                         verticalAlign="middle"
+                        w="full"
                     >
                         {type && (
                             <Center

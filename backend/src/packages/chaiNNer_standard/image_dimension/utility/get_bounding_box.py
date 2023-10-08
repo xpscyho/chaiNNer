@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Tuple
 
 import numpy as np
-
 from nodes.properties.inputs import ImageInput, SliderInput
 from nodes.properties.outputs import NumberOutput
 from nodes.utils.utils import get_h_w_c
@@ -34,6 +33,7 @@ from .. import utility_group
         NumberOutput("Width", output_type="min(uint, Input0.width) & 1.."),
         NumberOutput("Height", output_type="min(uint, Input0.height) & 1.."),
     ],
+    node_type="compact",
 )
 def get_bounding_box_node(
     img: np.ndarray,

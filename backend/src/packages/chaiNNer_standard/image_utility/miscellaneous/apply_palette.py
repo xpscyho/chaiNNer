@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import numpy as np
-
 import navi
+import numpy as np
 from nodes.properties.inputs import ImageInput
 from nodes.properties.outputs import ImageOutput
 from nodes.utils.utils import get_h_w_c
@@ -47,6 +46,7 @@ def quantize(img: np.ndarray, levels: int) -> np.ndarray:
     outputs=[
         ImageOutput(image_type=navi.Image(size_as="Input0", channels_as="Input1"))
     ],
+    node_type="compact",
 )
 def apply_palette_node(
     img: np.ndarray,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 from chainner_ext import Clipboard
-
 from nodes.properties.inputs import ClipboardInput
 
 from .. import clipboard_group
@@ -19,6 +18,7 @@ from .. import clipboard_group
     outputs=[],
     side_effects=True,
     limited_to_8bpc="The image will be copied to clipboard with 8 bits/channel.",
+    node_type="compact",
 )
 def copy_to_clipboard_node(value: str | np.ndarray) -> None:
     if isinstance(value, np.ndarray):

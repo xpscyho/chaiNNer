@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import numpy as np
-
 import navi
+import numpy as np
 from nodes.group import group
 from nodes.groups import if_enum_group
 from nodes.impl.color.convert import (
@@ -46,6 +45,7 @@ COLOR_SPACES_WITH_ALPHA_PARTNER = [
     ],
     outputs=[
         ImageOutput(
+            "",
             image_type=navi.Image(
                 size_as="Input0",
                 channels="""
@@ -59,6 +59,7 @@ COLOR_SPACES_WITH_ALPHA_PARTNER = [
             assume_normalized=True,
         )
     ],
+    node_type="compact",
 )
 def change_colorspace_node(
     img: np.ndarray, input_: int, output: int, alpha: bool

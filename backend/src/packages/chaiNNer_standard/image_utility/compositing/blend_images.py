@@ -4,7 +4,6 @@ from enum import Enum
 
 import cv2
 import numpy as np
-
 from nodes.groups import Condition, if_enum_group, if_group
 from nodes.impl.blend import BlendMode, blend_images
 from nodes.impl.color.color import Color
@@ -190,6 +189,7 @@ BLEND_OVERLAY_X0_Y0_FACTORS = {
             assume_normalized=True,
         ).with_never_reason("At least one layer must be an image"),
     ],
+    node_type="compact",
 )
 def blend_images_node(
     base: np.ndarray | Color,

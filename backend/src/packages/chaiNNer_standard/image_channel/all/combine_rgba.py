@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from nodes.impl.color.color import Color
 from nodes.properties.inputs import ImageInput
 from nodes.properties.outputs import ImageOutput
@@ -18,16 +17,10 @@ from . import node_group
     ),
     icon="MdCallMerge",
     inputs=[
-        ImageInput("R Channel", channels=1, allow_colors=True).with_docs(
-            "The red channel."
-        ),
-        ImageInput("G Channel", channels=1, allow_colors=True).with_docs(
-            "The green channel."
-        ),
-        ImageInput("B Channel", channels=1, allow_colors=True).with_docs(
-            "The blue channel."
-        ),
-        ImageInput("A Channel", channels=1, allow_colors=True)
+        ImageInput("R", channels=1, allow_colors=True).with_docs("The red channel."),
+        ImageInput("G", channels=1, allow_colors=True).with_docs("The green channel."),
+        ImageInput("B", channels=1, allow_colors=True).with_docs("The blue channel."),
+        ImageInput("A", channels=1, allow_colors=True)
         .with_docs("The alpha (transparency mask) channel.")
         .make_optional(),
     ],
@@ -52,6 +45,7 @@ from . import node_group
             "All input channels must have the same size, and at least one input channel must be an image."
         )
     ],
+    node_type="compact",
 )
 def combine_rgba_node(
     img_r: np.ndarray | Color,

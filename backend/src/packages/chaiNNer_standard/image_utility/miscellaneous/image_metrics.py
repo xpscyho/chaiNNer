@@ -5,7 +5,6 @@ from typing import Tuple
 
 import cv2
 import numpy as np
-
 from nodes.impl.image_utils import calculate_ssim
 from nodes.properties.inputs import ImageInput
 from nodes.properties.outputs import NumberOutput
@@ -22,14 +21,15 @@ from .. import miscellaneous_group
     ),
     icon="MdOutlineAssessment",
     inputs=[
-        ImageInput("Original Image"),
-        ImageInput("Comparison Image"),
+        ImageInput("Original"),
+        ImageInput("Comparison"),
     ],
     outputs=[
         NumberOutput("MSE", output_type="0..1"),
         NumberOutput("PSNR", output_type="0.."),
         NumberOutput("SSIM", output_type="0..1"),
     ],
+    node_type="compact",
 )
 def image_metrics_node(
     orig_img: np.ndarray, comp_img: np.ndarray

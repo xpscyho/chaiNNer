@@ -153,7 +153,7 @@ export const WithLabel = memo(
                 w="full"
             >
                 <Center
-                    h="1.25rem"
+                    h="full"
                     px={1}
                     py={0.5}
                     verticalAlign="middle"
@@ -216,6 +216,7 @@ export const WithoutLabel = memo(
         return (
             <Box
                 className="without-label"
+                minH="2rem"
                 py={1}
                 w="full"
             >

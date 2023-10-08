@@ -22,9 +22,10 @@ import { useNodeMenu } from '../../hooks/useNodeMenu';
 import { useRunNode } from '../../hooks/useRunNode';
 import { useValidity } from '../../hooks/useValidity';
 import { useWatchFiles } from '../../hooks/useWatchFiles';
+import { CompactNodeHeader } from './CompactNodeHeader';
 import { HNodeBody } from './HorizontalNodeBody';
 import { NodeProps, getSingleFileInput } from './Node';
-import { NodeFooter } from './NodeFooter/NodeFooter';
+import { NodeHeader } from './NodeHeader';
 /**
  * If there is only one file input, then this input will be returned. `undefined` otherwise.
  */
@@ -178,16 +179,24 @@ const CompactNodeInner = memo(({ data, selected }: NodeProps) => {
             onDragOver={onDragOver}
             onDrop={onDrop}
         >
-            <VStack opacity={disabled.status === DisabledStatus.Enabled ? 1 : 0.75}>
+            <VStack
+                opacity={disabled.status === DisabledStatus.Enabled ? 1 : 0.75}
+                spacing={0}
+                w="full"
+            >
+                <CompactNodeHeader
+                    accentColor={accentColor}
+                    animated={animated}
+                    disabledStatus={disabled.status}
+                    icon={schema.icon}
+                    name={schema.name}
+                    parentNode={parentNode}
+                    selected={selected}
+                    validity={validity}
+                />
                 <HNodeBody
                     animated={animated}
                     nodeState={nodeState}
-                />
-                <NodeFooter
-                    animated={animated}
-                    id={id}
-                    useDisable={disabled}
-                    validity={validity}
                 />
             </VStack>
         </Center>

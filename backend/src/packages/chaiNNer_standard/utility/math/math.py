@@ -24,16 +24,16 @@ class MathOperation(Enum):
 
 
 OP_LABEL: Dict[MathOperation, str] = {
-    MathOperation.ADD: "Add: a + b",
-    MathOperation.SUBTRACT: "Subtract: a - b",
-    MathOperation.MULTIPLY: "Multiply: a × b",
-    MathOperation.DIVIDE: "Divide: a ÷ b",
-    MathOperation.POWER: "Exponent: a ^ b",
-    MathOperation.LOG: "Logarithm: log a of b",
-    MathOperation.MAXIMUM: "Maximum: max(a, b)",
-    MathOperation.MINIMUM: "Minimum: min(a, b)",
-    MathOperation.MODULO: "Modulo: a mod b",
-    MathOperation.PERCENT: "Percent: a × b ÷ 100",
+    MathOperation.ADD: "+",
+    MathOperation.SUBTRACT: "-",
+    MathOperation.MULTIPLY: "×",
+    MathOperation.DIVIDE: "÷",
+    MathOperation.POWER: "^",
+    MathOperation.LOG: "log a of b",
+    MathOperation.MAXIMUM: "max(a, b)",
+    MathOperation.MINIMUM: "min(a, b)",
+    MathOperation.MODULO: "a mod b",
+    MathOperation.PERCENT: "a × b ÷ 100",
 }
 
 _special_mod_numbers = (0.0, float("inf"), float("-inf"), float("nan"))
@@ -50,15 +50,15 @@ _special_mod_numbers = (0.0, float("inf"), float("-inf"), float("nan"))
     icon="MdCalculate",
     inputs=[
         NumberInput(
-            "Operand a",
+            "",
             minimum=None,
             maximum=None,
             precision=100,
             controls_step=1,
         ),
-        EnumInput(MathOperation, "Math Operation", option_labels=OP_LABEL),
+        EnumInput(MathOperation, "", option_labels=OP_LABEL),
         NumberInput(
-            "Operand b",
+            "",
             minimum=None,
             maximum=None,
             precision=100,
@@ -87,6 +87,7 @@ _special_mod_numbers = (0.0, float("inf"), float("-inf"), float("nan"))
                 """,
         )
     ],
+    # node_type="compact",
 )
 def math_node(a: float, op: MathOperation, b: float) -> Union[int, float]:
     if op == MathOperation.ADD:

@@ -17,26 +17,33 @@ export const HNodeBody = memo(({ nodeState, animated = false }: NodeBodyProps) =
     const autoInput = inputs.length === 1 && isAutoInput(inputs[0]);
 
     return (
-        <HStack alignContent="space-between">
+        <HStack
+            h="full"
+            m={0}
+            spacing={1}
+            w="full"
+        >
             {!autoInput && (
                 <Box
                     bg="var(--bg-700)"
+                    h="full"
                     w="full"
                 >
                     <NodeInputs nodeState={nodeState} />
                 </Box>
             )}
-
-            {outputs.length > 0 && <Box py={1} />}
-            <Box
-                bg="var(--bg-700)"
-                w="full"
-            >
-                <NodeOutputs
-                    animated={animated}
-                    nodeState={nodeState}
-                />
-            </Box>
+            {outputs.length > 0 && (
+                <Box
+                    bg="var(--bg-700)"
+                    h="full"
+                    w="full"
+                >
+                    <NodeOutputs
+                        animated={animated}
+                        nodeState={nodeState}
+                    />
+                </Box>
+            )}
         </HStack>
     );
 });

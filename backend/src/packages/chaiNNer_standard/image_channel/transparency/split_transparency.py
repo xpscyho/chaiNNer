@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Tuple
 
-import numpy as np
-
 import navi
+import numpy as np
 from nodes.impl.image_utils import as_target_channels
 from nodes.properties.inputs import ImageInput
 from nodes.properties.outputs import ImageOutput
@@ -32,6 +31,7 @@ from . import node_group
             assume_normalized=True,
         ),
     ],
+    node_type="compact",
 )
 def split_transparency_node(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Split a multi-channel image into separate channels"""

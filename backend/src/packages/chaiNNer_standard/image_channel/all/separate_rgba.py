@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Tuple
 
-import numpy as np
-
 import navi
+import numpy as np
 from nodes.properties.inputs import ImageInput
 from nodes.properties.outputs import ImageOutput
 from nodes.utils.utils import get_h_w_c
@@ -23,7 +22,7 @@ from . import node_group
     inputs=[ImageInput()],
     outputs=[
         ImageOutput(
-            "R Channel",
+            "R",
             image_type=navi.Image(size_as="Input0"),
             channels=1,
             assume_normalized=True,
@@ -31,7 +30,7 @@ from . import node_group
         .with_docs("The red channel.")
         .with_id(2),
         ImageOutput(
-            "G Channel",
+            "G",
             image_type=navi.Image(size_as="Input0"),
             channels=1,
             assume_normalized=True,
@@ -39,7 +38,7 @@ from . import node_group
         .with_docs("The green channel.")
         .with_id(1),
         ImageOutput(
-            "B Channel",
+            "B",
             image_type=navi.Image(size_as="Input0"),
             channels=1,
             assume_normalized=True,
@@ -47,12 +46,13 @@ from . import node_group
         .with_docs("The blue channel.")
         .with_id(0),
         ImageOutput(
-            "A Channel",
+            "A",
             image_type=navi.Image(size_as="Input0"),
             channels=1,
             assume_normalized=True,
         ).with_docs("The alpha (transparency mask) channel."),
     ],
+    node_type="compact",
 )
 def separate_rgba_node(
     img: np.ndarray,

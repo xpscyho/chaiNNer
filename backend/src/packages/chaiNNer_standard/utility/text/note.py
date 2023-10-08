@@ -21,6 +21,7 @@ from .. import text_group
         ).make_optional(),
     ],
     outputs=[],
+    # node_type="compact",
 )
 def note_node(_text: Union[str, None]) -> None:
     return

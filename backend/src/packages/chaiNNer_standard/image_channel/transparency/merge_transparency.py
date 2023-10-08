@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from nodes.impl.color.color import Color
 from nodes.impl.image_utils import as_target_channels
 from nodes.properties.inputs import ImageInput
@@ -40,6 +39,7 @@ from . import node_group
             "RGB and Alpha must have the same size, and at least one must be an image."
         )
     ],
+    node_type="compact",
 )
 def merge_transparency_node(
     rgb: np.ndarray | Color,
